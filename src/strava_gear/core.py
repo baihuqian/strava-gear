@@ -38,11 +38,11 @@ def apply_rules(rules: Rules, activities: List[Dict]) -> Result:
 
 def usage_for_activity(activity: Dict, rule: Rule) -> Usage:
     component_map = rule.bikes.get(activity['gear_id'], {})
-    
+
     hashtags = [s for s in activity['name'].split() if s.startswith('#')]
     if activity['type'] == 'VirtualRide':
         hashtags.append(HashTag('#VirtualRide'))
-        
+
     for hashtag in hashtags:
         component_map_ht = rule.hashtags.get(hashtag)
         if component_map_ht:
