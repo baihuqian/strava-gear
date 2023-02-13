@@ -225,7 +225,8 @@ rules:
   # Note that null component in a hashtag rule only means that the hashtag no
   # longer assigns that component, it doesn't result in temporary unassignment
   # whenever that hashtag is used in an activity name. If you need that, use a
-  # dummy component id.
+  # placeholder component id. Placeholder components with ID containing 
+  # `placeholder`can be hidden using the `--hide-placeholder` option.
 
   # Dates are interpreted as midnight in your current time zone.
   # Time can be specified too, if you swapped components in between rides in
@@ -289,6 +290,8 @@ For a real life example, take a look at [my own rules.yaml](https://github.com/l
       --show-name / --hide-name       Show long component names  [default: show-name]
       --show-first-last / --hide-first-last
                                       Show first/last usage of components  [default: show-first-last]
+      --show-placeholder / --hide-placeholder
+                                      Show placeholder components  [default: show-placeholder]
       --help                          Show this message and exit.
 <!-- end include -->
 

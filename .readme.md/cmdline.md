@@ -20,4 +20,6 @@
       --show-name / --hide-name       Show long component names  [default: show-name]
       --show-first-last / --hide-first-last
                                       Show first/last usage of components  [default: show-first-last]
+      --show-placeholder / --hide-placeholder
+                                      Show placeholder components  [default: show-placeholder]
       --help                          Show this message and exit.

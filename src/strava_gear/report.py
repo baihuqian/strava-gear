@@ -12,7 +12,7 @@ from .data import FirstLast
 from .data import Result
 
 
-def report(f, res: Result, output, tablefmt: str, show_name: bool, show_first_last: bool):
+def report(f, res: Result, output, tablefmt: str, show_name: bool, show_first_last: bool, show_placeholder: bool):
     def cols(d: Dict) -> Dict:
         if not show_name:
             del d["name"]
@@ -21,6 +21,8 @@ def report(f, res: Result, output, tablefmt: str, show_name: bool, show_first_la
         return d
 
     table = [cols(d) for d in f(res)]
+    if not show_placeholder:
+        table = filter(lambda d: 'placeholder' not in d['id'].lower(), table)
     if not table:
         return
 
@@ -43,7 +45,7 @@ def report_components(res: Result) -> Iterator[Dict]:
         }
 
 
-def report_bikes(res: Result, show_names: bool = True, show_firstlasts: bool = True) -> Iterator[Dict]:
+def report_bikes(res: Result) -> Iterator[Dict]:
     bikes_firstlasts = bikes_firstlast(res)
 
     def sort_key(c: Component):

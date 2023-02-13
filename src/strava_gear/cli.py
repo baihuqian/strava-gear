@@ -49,6 +49,10 @@ from .report import reports
 @click.option(
     '--show-first-last/--hide-first-last', default=True, show_default=True,
     help="Show first/last usage of components")
+@click.option(
+    '--show-placeholder/--hide-placeholder', default=True, show_default=True,
+    help='Show placeholder components'
+)
 def main(
     rules_input: TextIO,
     csv: Optional[TextIO],
@@ -58,6 +62,7 @@ def main(
     tablefmt: str,
     show_name: bool,
     show_first_last: bool,
+    show_placeholder: bool,
 ):
     if csv:
         aliases, activities = read_input_csv(csv)
@@ -65,7 +70,13 @@ def main(
         aliases, activities = read_strava_offline(strava_database)
     rules = read_rules(rules_input, aliases=aliases)
     res = apply_rules(rules, activities)
-    reports[report](res, output=output, tablefmt=tablefmt, show_name=show_name, show_first_last=show_first_last)
+    reports[report](res, 
+                    output=output, 
+                    tablefmt=tablefmt, 
+                    show_name=show_name, 
+                    show_first_last=show_first_last, 
+                    show_placeholder=show_placeholder
+                    )
     warn_unknown_bikes(rules, activities)
 
 
