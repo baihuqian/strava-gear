@@ -26,7 +26,7 @@ Planned, not yet implemented features:
 
 * [configurable alerts that a component might be worn out and needs servicing
   or replacing](https://github.com/liskin/strava-gear/issues/3)
-  
+
 ![Example screenshot](https://user-images.githubusercontent.com/300342/133298545-0573cef3-593d-427a-89b1-5c049374d394.png)
 
 [strava-offline]: https://github.com/liskin/strava-offline#readme
@@ -212,12 +212,6 @@ rules:
     "#cx-tyres":
       tyre-front: schwalbe-x-one-3
       tyre-rear: schwalbe-x-one-4
-  
-  # A special hashtag `#VirtualRide` can be used to define component assignements
-  # for indoor trainer rides from Zwift, Rouvy, etc.
-  - "#VirtualRide":
-      tyre-front: wahoo-kickr-climb
-      tyre-rear: wahoo-kickr
 
   # These temporarily change component assignments whenever the given hashtag
   # appears in the name (not description!) of an activity.
@@ -227,6 +221,15 @@ rules:
   # whenever that hashtag is used in an activity name. If you need that, use a
   # placeholder component id. Placeholder components with ID containing 
   # `placeholder`can be hidden using the `--hide-placeholder` option.
+
+  # Special virtual hashtags `#column=value` are available for all columns in
+  # the input database/csv. These can for example be used to define component
+  # assignments for indoor trainer rides from Zwift, Rouvy, etc.:
+  - "#type=VirtualRide":
+      tyre-front: wahoo-kickr-climb
+      tyre-rear: wahoo-kickr
+  - "#commute=1":
+      shoes: chrome-industries-kursk
 
   # Dates are interpreted as midnight in your current time zone.
   # Time can be specified too, if you swapped components in between rides in
@@ -267,7 +270,7 @@ For a real life example, take a look at [my own rules.yaml](https://github.com/l
 
 ## Command line options
 
-<!-- include .readme.md/cmdline.md -->
+<!-- include tests/readme/help.md -->
 <!--
     $ export COLUMNS=120
 -->
@@ -278,8 +281,8 @@ For a real life example, take a look at [my own rules.yaml](https://github.com/l
     Options:
       --rules FILENAME                Rules configuration (bikes, components, ...)  [default:
                                       /home/user/.config/strava_gear/rules.yaml]
-      --csv FILENAME                  Load activities from CSV instead of the strava-offline database (columns: name,
-                                      gear_id, start_date, moving_time, distance)
+      --csv FILENAME                  Load activities from CSV instead of the strava-offline database (columns: distance,
+                                      gear_id, moving_time, name, start_date, total_elevation_gain)
       --strava-database PATH          Location of the strava-offline database  [default:
                                       /home/user/.local/share/strava_offline/strava.sqlite]
       -o, --output FILENAME           Output file  [default: -]
@@ -292,6 +295,8 @@ For a real life example, take a look at [my own rules.yaml](https://github.com/l
                                       Show first/last usage of components  [default: show-first-last]
       --show-placeholder / --hide-placeholder
                                       Show placeholder components  [default: show-placeholder]
+      --show-vert / --hide-vert       Show vertical (elevation gain)  [default: hide-vert]
+      --units [metric|imperial]       Show data in metric or imperial  [default: metric]
       --help                          Show this message and exit.
 <!-- end include -->
 

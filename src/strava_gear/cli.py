@@ -7,9 +7,11 @@ import platformdirs
 
 from .core import apply_rules
 from .core import warn_unknown_bikes
+from .input.activities import essential_columns
 from .input.activities import read_input_csv
 from .input.activities import read_strava_offline
 from .input.rules import read_rules
+from .report import Units
 from .report import reports
 
 
@@ -21,9 +23,9 @@ from .report import reports
     help="Rules configuration (bikes, components, ...)")
 @click.option(
     '--csv', type=click.File('r'),
-    help="""
+    help=f"""
     Load activities from CSV instead of the strava-offline database
-    (columns: name, gear_id, start_date, moving_time, distance)
+    (columns: {", ".join(sorted(essential_columns))})
     """)
 @click.option(
     '--strava-database', type=click.Path(path_type=Path),  # type: ignore [type-var] # debian typeshed compat
@@ -53,7 +55,14 @@ from .report import reports
     '--show-placeholder/--hide-placeholder', default=True, show_default=True,
     help='Show placeholder components'
 )
-def main(
+@click.option(
+    '--show-vert/--hide-vert', default=False, show_default=True,
+    help="Show vertical (elevation gain)")
+@click.option(
+    '--units', type=click.Choice([u.name.lower() for u in Units]), default=Units.METRIC.name.lower(), show_default=True,
+    callback=lambda _ctx, _param, v: Units[v.upper()],  # TODO: drop when Python 3.11 is the oldest supported
+    help="Show data in metric or imperial")
+def cli(
     rules_input: TextIO,
     csv: Optional[TextIO],
     strava_database: Path,
@@ -63,6 +72,8 @@ def main(
     show_name: bool,
     show_first_last: bool,
     show_placeholder: bool,
+    show_vert: bool,
+    units: Units,
 ):
     if csv:
         aliases, activities = read_input_csv(csv)
@@ -70,15 +81,13 @@ def main(
         aliases, activities = read_strava_offline(strava_database)
     rules = read_rules(rules_input, aliases=aliases)
     res = apply_rules(rules, activities)
-    reports[report](res, 
-                    output=output, 
-                    tablefmt=tablefmt, 
-                    show_name=show_name, 
-                    show_first_last=show_first_last, 
-                    show_placeholder=show_placeholder
-                    )
+    reports[report](
+        res, 
+        output=output, tablefmt=tablefmt, 
+        show_name=show_name, 
+        show_first_last=show_first_last, 
+        show_placeholder=show_placeholder,
+        show_vert=show_vert,
+        units=units,
+    )
     warn_unknown_bikes(rules, activities)
-
-
-if __name__ == "__main__":
-    main()

@@ -1,7 +1,10 @@
 from collections import defaultdict
 import csv
+from enum import Enum
+from enum import auto
 from functools import partial
 from typing import Dict
+from typing import Final
 from typing import Iterator
 
 from tabulate import tabulate
@@ -11,13 +14,41 @@ from .data import Component
 from .data import FirstLast
 from .data import Result
 
+MILE_IN_METERS: Final[float] = 1_609.344
+FOOT_IN_METERS: Final[float] = 0.3048
 
-def report(f, res: Result, output, tablefmt: str, show_name: bool, show_first_last: bool, show_placeholder: bool):
+
+class Units(Enum):
+    METRIC = auto()
+    IMPERIAL = auto()
+
+
+def report(
+    f,
+    res: Result,
+    output,
+    tablefmt: str,
+    show_name: bool,
+    show_first_last: bool,
+    show_placeholder: bool,
+    show_vert: bool,
+    units: Units,
+):
     def cols(d: Dict) -> Dict:
         if not show_name:
             del d["name"]
         if not show_first_last:
             del d["first … last"]
+        if units == Units.IMPERIAL:
+            del d["km"]
+            del d["vert m"]
+            if not show_vert:
+                del d["vert ft"]
+        else:
+            del d["mi"]
+            del d["vert ft"]
+            if not show_vert:
+                del d["vert m"]
         return d
 
     table = [cols(d) for d in f(res)]
@@ -27,7 +58,7 @@ def report(f, res: Result, output, tablefmt: str, show_name: bool, show_first_la
         return
 
     if tablefmt == 'csv':
-        writer = csv.DictWriter(output, fieldnames=list(table[0].keys()))
+        writer = csv.DictWriter(output, fieldnames=list(table[0].keys()), lineterminator='\n')
         writer.writeheader()
         writer.writerows(table)
     else:
@@ -35,11 +66,14 @@ def report(f, res: Result, output, tablefmt: str, show_name: bool, show_first_la
 
 
 def report_components(res: Result) -> Iterator[Dict]:
-    for c in sorted(res.components, key=lambda c: c.firstlast):
+    for c in sorted(res.components, key=lambda c: (c.firstlast, c.ident,)):
         yield {
             "id": c.ident,
             "name": c.name,
             "km": c.distance / 1000,
+            "mi": c.distance / MILE_IN_METERS,
+            "vert m": c.elevation_gain,
+            "vert ft": c.elevation_gain / FOOT_IN_METERS,
             "hour": c.time / 3600,
             "first … last": c.firstlast,
         }
@@ -63,6 +97,9 @@ def report_bikes(res: Result) -> Iterator[Dict]:
             "id": c.ident,
             "name": c.name,
             "km": c.distance / 1000,
+            "mi": c.distance / MILE_IN_METERS,
+            "vert m": c.elevation_gain,
+            "vert ft": c.elevation_gain / FOOT_IN_METERS,
             "hour": c.time / 3600,
             "first … last": c.firstlast,
         }
